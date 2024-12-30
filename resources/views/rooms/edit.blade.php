@@ -17,7 +17,19 @@
             <div class="mb-3">
                 <label for="capacity" class="form-label">Capacity</label>
                 <input type="number" name="capacity" id="capacity" class="form-control" value="{{ $room->capacity }}" required>
-            </div>
+            </div><div class="mb-3">
+
+              <label for="equipments" class="form-label">Equipments</label>
+    <select name="equipments[]" id="equipments" class="form-control" multiple>
+        @foreach (\App\Models\Equipment::all() as $equipment)
+            <option value="{{ $equipment->id }}" 
+                @if(isset($room) && $room->equipments->contains($equipment->id)) selected @endif>
+                {{ $equipment->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
             <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>

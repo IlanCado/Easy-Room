@@ -10,6 +10,7 @@
                     <th>Name</th>
                     <th>Description</th>
                     <th>Capacity</th>
+                    <th>Equipments</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -20,6 +21,18 @@
                         <td>{{ $room->description }}</td>
                         <td>{{ $room->capacity }}</td>
                         <td>
+                            @if ($room->equipments->isNotEmpty())
+                                <ul>
+                                    @foreach ($room->equipments as $equipment)
+                                        <li>{{ $equipment->name }}</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <span>No Equipments</span>
+                            @endif
+                        </td>
+                        <td>
+                            <a href="{{ route('rooms.show', $room) }}" class="btn btn-info">View</a>
                             <a href="{{ route('rooms.edit', $room) }}" class="btn btn-warning">Edit</a>
                             <form action="{{ route('rooms.destroy', $room) }}" method="POST" style="display: inline;">
                                 @csrf

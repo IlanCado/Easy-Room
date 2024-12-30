@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\EquipmentController;
 
 
 Route::get('/', function () {
@@ -22,3 +23,4 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::resource('rooms', RoomController::class);
+Route::resource('equipments', EquipmentController::class);
