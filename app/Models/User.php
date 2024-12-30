@@ -23,6 +23,12 @@ class User extends Authenticatable
         'password',
     ];
 
+     // Relation : Un utilisateur peut avoir plusieurs réservations
+     public function reservations()
+     {
+         return $this->hasMany(Reservation::class);
+     }
+
     /**
      * The attributes that should be hidden for serialization.
      *
