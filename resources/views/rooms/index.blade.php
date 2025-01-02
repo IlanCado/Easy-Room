@@ -1,48 +1,74 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h1>Rooms</h1>
-        <a href="{{ route('rooms.create') }}" class="btn btn-primary mb-3">Add Room</a>
-        <table class="table">
-            <thead>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Liste des Salles</h1>
+        <a href="{{ route('rooms.create') }}" class="btn btn-primary">Ajouter une Salle</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
                 <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Capacity</th>
-                    <th>Equipments</th>
+                    <th class="text-start">Nom</th>
+                    <th class="text-start">Description</th>
+                    <th>Capacité</th>
+                    <th>Équipements</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($rooms as $room)
+                @forelse ($rooms as $room)
                     <tr>
-                        <td>{{ $room->name }}</td>
-                        <td>{{ $room->description }}</td>
-                        <td>{{ $room->capacity }}</td>
+                        <td class="text-start fw-bold">{{ $room->name }}</td>
+                        <td class="text-start">{{ $room->description }}</td>
+                        <td>{{ $room->capacity }} personnes</td>
                         <td>
                             @if ($room->equipments->isNotEmpty())
-                                <ul>
+                                <ul class="list-unstyled mb-0">
                                     @foreach ($room->equipments as $equipment)
                                         <li>{{ $equipment->name }}</li>
                                     @endforeach
                                 </ul>
                             @else
-                                <span>No Equipments</span>
+                                <span class="text-muted">Aucun équipement</span>
                             @endif
                         </td>
-                        <td>
-                            <a href="{{ route('rooms.show', $room) }}" class="btn btn-info">View</a>
-                            <a href="{{ route('rooms.edit', $room) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('rooms.destroy', $room) }}" method="POST" style="display: inline;">
+                        <td class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('rooms.show', $room->id) }}" class="btn btn-info btn-sm" title="Voir">
+                                <i class="bi bi-eye"></i> Voir
+                            </a>
+                            <a href="{{ route('rooms.edit', $room->id) }}" class="btn btn-warning btn-sm" title="Modifier">
+                                <i class="bi bi-pencil-square"></i> Modifier
+                            </a>
+                            <form action="{{ route('rooms.destroy', $room->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </button>
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Aucune salle disponible.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
+</div>
+
+<style>
+    h1 {
+        font-size: 1.75rem;
+        font-weight: bold;
+    }
+
+    table th, table td {
+        vertical-align: middle;
+    }
+</style>
 @endsection
