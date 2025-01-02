@@ -10,70 +10,72 @@ class RoomController extends Controller
 {
     public function index()
     {
-        $rooms = Room::with('equipments')->get(); 
+        $rooms = Room::with('equipments')->get();
         return view('rooms.index', compact('rooms'));
     }
 
     public function create()
     {
-        $equipments = Equipment::all(); 
+        $equipments = Equipment::all();
         return view('rooms.create', compact('equipments'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
-            'equipments' => 'array', 
-            'equipments.*' => 'exists:equipments,id', 
+            'equipments' => 'nullable|array',
+            'equipments.*' => 'exists:equipments,id',
         ]);
 
-        $room = Room::create($request->only('name', 'description', 'capacity'));
+        $room = Room::create($validated);
 
-        
-        $room->equipments()->sync($request->equipments);
+        if ($request->has('equipments')) {
+            $room->equipments()->sync($request->equipments);
+        }
 
-        return redirect()->route('rooms.index')->with('success', 'Room created successfully.');
+        return redirect()->route('rooms.index')->with('success', 'Salle créée avec succès.');
     }
 
     public function show(Room $room)
     {
-        $room->load('equipments'); 
+        $room->load('equipments');
         return view('rooms.show', compact('room'));
     }
 
     public function edit(Room $room)
     {
-        $equipments = Equipment::all(); 
-        $room->load('equipments'); 
+        $equipments = Equipment::all();
+        $room->load('equipments');
         return view('rooms.edit', compact('room', 'equipments'));
     }
 
     public function update(Request $request, Room $room)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
-            'equipments' => 'array', 
-            'equipments.*' => 'exists:equipments,id', 
+            'equipments' => 'nullable|array',
+            'equipments.*' => 'exists:equipments,id',
         ]);
 
-        $room->update($request->only('name', 'description', 'capacity'));
+        $room->update($validated);
 
-        
-        $room->equipments()->sync($request->equipments);
+        if ($request->has('equipments')) {
+            $room->equipments()->sync($request->equipments);
+        }
 
-        return redirect()->route('rooms.index')->with('success', 'Room updated successfully.');
+        return redirect()->route('rooms.index')->with('success', 'Salle mise à jour avec succès.');
     }
 
     public function destroy(Room $room)
     {
-        $room->equipments()->detach(); 
+        $room->equipments()->detach();
         $room->delete();
 
-        return redirect()->route('rooms.index')->with('success', 'Room deleted successfully.');
+        return redirect()->route('rooms.index')->with('success', 'Salle supprimée avec succès.');
     }
 }

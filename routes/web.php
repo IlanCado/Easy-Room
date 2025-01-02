@@ -29,19 +29,21 @@ Route::resource('rooms', RoomController::class);
 Route::resource('equipments', EquipmentController::class);
 
 // Routes pour les réservations
-Route::get('/calendar/{roomId}', [ReservationController::class, 'calendar'])->name('reservations.calendar'); // Afficher le calendrier d'une salle
-Route::get('/reservations/{roomId}', [ReservationController::class, 'getReservationsByRoom']); // Récupérer les réservations pour une salle
-Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store'); // Créer une nouvelle réservation
-Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy'); // Supprimer une réservation
-Route::get('/reservations/confirmation', function () {
-    return view('reservations.confirmation', [
-        'status' => request()->query('status'),
-        'message' => request()->query('message'),
-        'roomId' => request()->query('roomId'),
-    ]);
-})->name('reservations.confirmation');
+Route::prefix('reservations')->group(function () {
+    Route::get('/calendar/{roomId}', [ReservationController::class, 'calendar'])->name('reservations.calendar'); // Afficher le calendrier d'une salle
+    Route::get('/{roomId}', [ReservationController::class, 'getReservationsByRoom']); // Récupérer les réservations pour une salle
+    Route::post('/', [ReservationController::class, 'store'])->name('reservations.store'); // Créer une nouvelle réservation
+    Route::delete('/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy'); // Supprimer une réservation
+    Route::get('/confirmation', function () {
+        return view('reservations.confirmation', [
+            'status' => request()->query('status'),
+            'message' => request()->query('message'),
+            'roomId' => request()->query('roomId'),
+        ]);
+    })->name('reservations.confirmation');
+});
 
-Route::get('/reservations/{roomId}', [ReservationController::class, 'getReservationsByRoom']);
+// Route pour afficher une salle spécifique
 Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
 
 // Authentification
