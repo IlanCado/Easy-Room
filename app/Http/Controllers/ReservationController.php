@@ -20,7 +20,7 @@ class ReservationController extends Controller
 
         return $reservations->map(function ($reservation) {
             return [
-                'title' => 'Réservé',
+                'title' => 'Réservé par ' . ($reservation->user->name ?? 'Utilisateur'),
                 'start' => $reservation->start_time,
                 'end' => $reservation->end_time,
             ];
@@ -47,7 +47,7 @@ class ReservationController extends Controller
             'start_time' => 'required|date|after:now',
             'end_time' => 'required|date|after:start_time',
         ]);
-    
+
         // Vérification des chevauchements
         $overlap = Reservation::where('room_id', $validated['room_id'])
             ->where(function ($query) use ($validated) {
@@ -59,14 +59,25 @@ class ReservationController extends Controller
                       });
             })
             ->exists();
-    
+
         if ($overlap) {
             return response()->json(['error' => 'Le créneau est déjà réservé.'], 422);
         }
-    
-        Reservation::create($validated);
-    
-        return response()->json(['success' => 'Réservation créée avec succès.']);
+
+        $reservation = Reservation::create([
+            'user_id' => auth()->id(), // Ajout de l'utilisateur authentifié
+            'room_id' => $validated['room_id'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+        ]);
+
+        return response()->json([
+            'success' => 'Réservation créée avec succès.',
+            'reservation' => [
+                'title' => 'Réservé par ' . ($reservation->user->name ?? 'Utilisateur'),
+                'start' => $reservation->start_time,
+                'end' => $reservation->end_time,
+            ],
+        ]);
     }
-    
 }

@@ -41,5 +41,8 @@ Route::get('/reservations/confirmation', function () {
     ]);
 })->name('reservations.confirmation');
 
+Route::get('/reservations/{roomId}', [ReservationController::class, 'getReservationsByRoom']);
+Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
+
 // Authentification
 require __DIR__ . '/auth.php';
