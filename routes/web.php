@@ -16,9 +16,12 @@ Route::get('/dashboard', function () {
 
 // Routes protégées par middleware pour les utilisateurs authentifiés
 Route::middleware('auth')->group(function () {
+    // Gestion du profil utilisateur
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Mes réservations
     Route::get('/my-reservations', [ReservationController::class, 'userReservations'])->name('my-reservations');
 });
 
@@ -34,6 +37,7 @@ Route::prefix('reservations')->group(function () {
     Route::get('/{roomId}', [ReservationController::class, 'getReservationsByRoom']); // Récupérer les réservations pour une salle
     Route::post('/', [ReservationController::class, 'store'])->name('reservations.store'); // Créer une nouvelle réservation
     Route::delete('/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy'); // Supprimer une réservation
+    Route::get('/details/{id}', [ReservationController::class, 'show'])->name('reservations.details'); // Voir les détails d'une réservation
     Route::get('/confirmation', function () {
         return view('reservations.confirmation', [
             'status' => request()->query('status'),
@@ -42,9 +46,6 @@ Route::prefix('reservations')->group(function () {
         ]);
     })->name('reservations.confirmation');
 });
-
-// Route pour afficher une salle spécifique
-Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
 
 // Authentification
 require __DIR__ . '/auth.php';

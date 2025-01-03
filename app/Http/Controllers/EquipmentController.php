@@ -24,9 +24,11 @@ class EquipmentController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        Equipment::create($request->all());
+        Equipment::create([
+            'name' => $request->name,
+        ]);
 
-        return redirect()->route('equipments.index')->with('success', 'Equipment created successfully.');
+        return redirect()->route('equipments.index')->with('success', 'Équipement créé avec succès.');
     }
 
     public function edit(Equipment $equipment)
@@ -40,15 +42,17 @@ class EquipmentController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $equipment->update($request->all());
+        $equipment->update([
+            'name' => $request->name,
+        ]);
 
-        return redirect()->route('equipments.index')->with('success', 'Equipment updated successfully.');
+        return redirect()->route('equipments.index')->with('success', 'Équipement mis à jour avec succès.');
     }
 
     public function destroy(Equipment $equipment)
     {
         $equipment->delete();
 
-        return redirect()->route('equipments.index')->with('success', 'Equipment deleted successfully.');
+        return redirect()->route('equipments.index')->with('success', 'Équipement supprimé avec succès.');
     }
 }

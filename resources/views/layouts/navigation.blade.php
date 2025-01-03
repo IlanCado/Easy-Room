@@ -18,11 +18,11 @@
                     <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.index')">
                         {{ __('Salles') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('reservations.calendar', ['roomId' => 1])" :active="request()->routeIs('reservations.calendar')">
-                        {{ __('Calendrier') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('my-reservations')" :active="request()->routeIs('my-reservations')">
                         {{ __('Mes Réservations') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('equipments.index')" :active="request()->routeIs('equipments.index')">
+                        {{ __('Équipements') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -90,11 +90,11 @@
             <x-responsive-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.index')">
                 {{ __('Salles') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('reservations.calendar', ['roomId' => 1])" :active="request()->routeIs('reservations.calendar')">
-                {{ __('Calendrier') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('my-reservations')" :active="request()->routeIs('my-reservations')">
                 {{ __('Mes Réservations') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('equipments.index')" :active="request()->routeIs('equipments.index')">
+                {{ __('Équipements') }}
             </x-responsive-nav-link>
         </div>
 
