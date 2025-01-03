@@ -14,7 +14,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-light">
+    <div class="min-h-screen bg-light d-flex flex-column">
         <!-- Include the navigation -->
         @include('layouts.navigation')
 
@@ -28,9 +28,24 @@
         @endif
 
         <!-- Page Content -->
-        <main class="container my-4">
+        <main class="flex-grow-1 container my-4">
+            <!-- Error Message -->
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             @yield('content')
         </main>
+
+        <!-- Footer -->
+        <footer class="bg-white text-dark py-3">
+            <div class="container text-center">
+                <p>&copy; {{ date('Y') }} Easy Room. Tous droits réservés.</p>
+            </div>
+        </footer>
     </div>
 
     <!-- Include Bootstrap JS -->

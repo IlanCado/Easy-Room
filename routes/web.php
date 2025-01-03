@@ -16,18 +16,19 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Routes protégées par middleware pour les utilisateurs authentifiés
-Route::middleware('auth')->group(function () {
+Route::middleware('auth.check')->group(function () {
     // Gestion du profil utilisateur
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Mes réservations
-    Route::get('/my-reservations', [ReservationController::class, 'userReservations'])->name('my-reservations');
+    Route::get('/my-reservations', [ReservationController::class, 'userReservations'])
+        ->name('my-reservations');
 });
 
 // Routes protégées par middleware pour les administrateurs uniquement
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth.check', 'admin'])->group(function () {
     // Gestion des salles
     Route::get('/admin/rooms', [RoomController::class, 'adminIndex'])->name('admin.rooms.index'); // Page d'administration des salles
     Route::resource('rooms', RoomController::class)->except(['show']); // L'action "show" reste publique
@@ -42,7 +43,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 // Routes pour les réservations
-Route::prefix('reservations')->group(function () {
+Route::prefix('reservations')->middleware('auth.check')->group(function () {
     Route::get('/calendar/{roomId}', [ReservationController::class, 'calendar'])->name('reservations.calendar'); // Afficher le calendrier d'une salle
     Route::get('/{roomId}', [ReservationController::class, 'getReservationsByRoom']); // Récupérer les réservations pour une salle
     Route::post('/', [ReservationController::class, 'store'])->name('reservations.store'); // Créer une nouvelle réservation
@@ -57,8 +58,10 @@ Route::prefix('reservations')->group(function () {
     })->name('reservations.confirmation');
 });
 
-// Route publique pour afficher une salle spécifique (accessible par tout le monde)
-Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
+// Route publique pour afficher une salle spécifique
+Route::get('/rooms/{room}', [RoomController::class, 'show'])
+    ->name('rooms.show')
+    ->middleware('auth.check'); // Afficher une alerte pour les non-authentifiés
 
 // Authentification
 require __DIR__ . '/auth.php';
