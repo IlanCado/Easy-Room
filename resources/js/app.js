@@ -41,11 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
         allDaySlot: false, // Désactive les événements "toute la journée"
         selectable: true,
         select: function (info) {
-            const start = info.startStr;
-            const end = info.endStr;
+            const start = new Date(info.startStr);
+            const end = new Date(info.endStr);
+            const now = new Date();
+
+            // Vérifie si la réservation commence dans le passé
+            if (start < now) {
+                alert('Erreur : Vous ne pouvez pas réserver un créneau qui commence dans le passé.');
+                return;
+            }
+
+            // Vérifie si l'heure de fin est avant l'heure de début
+            if (end <= start) {
+                alert('Erreur : L\'heure de fin doit être après l\'heure de début.');
+                return;
+            }
 
             // Affiche une boîte de dialogue pour confirmation
-            if (confirm(`Créer une réservation de ${start} à ${end} ?`)) {
+            if (confirm(`Créer une réservation de ${start.toLocaleString()} à ${end.toLocaleString()} ?`)) {
                 // Envoie une requête POST pour créer la réservation
                 fetch('/reservations', {
                     method: 'POST',
@@ -55,34 +68,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({
                         room_id: roomId,
-                        start_time: start,
-                        end_time: end,
+                        start_time: info.startStr,
+                        end_time: info.endStr,
                     }),
                 })
                     .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(err => { throw err; });
+                        if (response.ok) {
+                            return response.json();
                         }
-                        return response.json();
+                        return response.json().then(err => { throw err; });
                     })
                     .then(data => {
                         alert(data.success || 'Réservation créée avec succès.');
                         calendar.refetchEvents(); // Recharge les événements
                     })
                     .catch(error => {
-                        alert(error.error || 'Erreur lors de la création de la réservation.');
+                        // Affiche un message d'erreur détaillé
+                        if (error.error) {
+                            alert(`Erreur : ${error.error}`);
+                        } else {
+                            alert('Erreur lors de la création de la réservation. Veuillez réessayer.');
+                        }
                     });
             }
         },
         eventContent: function (eventInfo) {
-            // Retourne un contenu simplifié et compact pour chaque événement
+            // Affiche les événements en format compact
             const timeText = `<span style="font-size: 0.85em; font-weight: bold;">${eventInfo.timeText}</span>`;
             const titleText = `<span style="font-size: 0.75em;">${eventInfo.event.title}</span>`;
             return {
                 html: `${timeText}<br>${titleText}`,
             };
         },
-        
     });
 
     calendar.render();

@@ -21,7 +21,7 @@
     <!-- Affichage des réservations sous forme de cartes -->
     @if ($reservations->isEmpty())
         <div class="alert alert-warning" role="alert">
-            Vous n'avez aucune réservation pour le moment. Explorez les <a href="{{ route('rooms.index') }}" class="alert-link">salles disponibles</a> pour en réserver une !
+            Vous n'avez aucune réservation pour le moment. Explorez les <a href="{{ route('home') }}" class="alert-link">salles disponibles</a> pour en réserver une !
         </div>
     @else
         <div class="row">
