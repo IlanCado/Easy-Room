@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil avec la liste des salles
@@ -45,6 +46,13 @@ Route::prefix('reservations')->group(function () {
             'roomId' => request()->query('roomId'),
         ]);
     })->name('reservations.confirmation');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users.index'); // Afficher tous les utilisateurs
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy'); // Supprimer un utilisateur
+    Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+    Route::get('/users/{id}/reservations', [UserController::class, 'showReservations'])->name('users.reservations');
 });
 
 // Authentification
