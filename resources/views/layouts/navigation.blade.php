@@ -20,7 +20,7 @@
                     </x-nav-link>
 
                     @if(auth()->check() && auth()->user()->role === 'admin') <!-- Vérification du rôle admin -->
-                        <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.index')">
+                        <x-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.index')">
                         {{ __('Salles') }}
                         </x-nav-link>
                         <x-nav-link :href="route('equipments.index')" :active="request()->routeIs('equipments.index')">

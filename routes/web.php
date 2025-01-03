@@ -29,7 +29,8 @@ Route::middleware('auth')->group(function () {
 // Routes protégées par middleware pour les administrateurs uniquement
 Route::middleware(['auth', 'admin'])->group(function () {
     // Gestion des salles
-    Route::resource('rooms', RoomController::class)->except(['show']); // L'action "show" doit rester publique
+    Route::get('/admin/rooms', [RoomController::class, 'adminIndex'])->name('admin.rooms.index'); // Page d'administration des salles
+    Route::resource('rooms', RoomController::class)->except(['show']); // L'action "show" reste publique
 
     // Gestion des équipements
     Route::resource('equipments', EquipmentController::class);

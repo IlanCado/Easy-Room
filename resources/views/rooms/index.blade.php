@@ -4,22 +4,21 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Nos Salles</h1>
-        @auth
-            @if (auth()->user()->role === 'admin') <!-- Vérifie si l'utilisateur est admin -->
-                <a href="{{ route('rooms.create') }}" class="btn btn-primary">Ajouter une Salle</a>
-            @endif
-        @endauth
     </div>
-
     <div class="row gy-4">
         @forelse ($rooms as $room)
             <div class="col-md-4">
-                <div class="card h-100 shadow">
-                    @if ($room->image)
-                        <img src="{{ asset($room->image) }}" class="card-img-top" alt="Image de la salle {{ $room->name }}" style="height: 200px; object-fit: cover;">
-                    @else
-                        <img src="https://via.placeholder.com/350x200?text=Image+non+disponible" class="card-img-top" alt="Image par défaut" style="height: 200px; object-fit: cover;">
-                    @endif
+                <a href="{{ route('rooms.show', $room->id) }}" class="card h-100 shadow text-decoration-none text-dark position-relative" style="transition: transform 0.2s;">
+                    <div class="card-img-container">
+                        @if ($room->image)
+                            <img src="{{ asset($room->image) }}" class="card-img-top" alt="Image de la salle {{ $room->name }}" style="height: 200px; object-fit: cover;">
+                        @else
+                            <img src="https://via.placeholder.com/350x200?text=Image+non+disponible" class="card-img-top" alt="Image par défaut" style="height: 200px; object-fit: cover;">
+                        @endif
+                        <div class="overlay">
+                            <span class="btn btn-primary">Obtenez une réservation</span>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title fw-bold">{{ $room->name }}</h5>
                         <p class="card-text text-muted">{{ Str::limit($room->description, 80, '...') }}</p>
@@ -37,26 +36,7 @@
                             @endif
                         </p>
                     </div>
-                    <div class="card-footer d-flex justify-content-between">
-                        <a href="{{ route('rooms.show', $room->id) }}" class="btn btn-info btn-sm" title="Voir">
-                            <i class="bi bi-eye"></i> Voir
-                        </a>
-                        @auth
-                            @if (auth()->user()->role === 'admin') <!-- Vérifie si l'utilisateur est admin -->
-                                <a href="{{ route('rooms.edit', $room->id) }}" class="btn btn-warning btn-sm" title="Modifier">
-                                    <i class="bi bi-pencil-square"></i> Modifier
-                                </a>
-                                <form action="{{ route('rooms.destroy', $room->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')">
-                                        <i class="bi bi-trash"></i> Supprimer
-                                    </button>
-                                </form>
-                            @endif
-                        @endauth
-                    </div>
-                </div>
+                </a>
             </div>
         @empty
             <div class="col-12">
@@ -78,6 +58,57 @@
 
     .card-text {
         font-size: 0.95rem;
+    }
+
+    .card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: scale(1.02); /* Agrandit légèrement toute la carte au survol */
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Ajoute une ombre plus marquée */
+    }
+
+    .card-img-container {
+        position: relative;
+    }
+
+    .card-img-top {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .card:hover .overlay {
+        opacity: 1; /* Affiche l'overlay au survol */
+    }
+
+    .overlay span {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        background-color: #007bff; /* Couleur du bouton */
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        text-transform: uppercase;
+    }
+
+    .overlay span:hover {
+        background-color: #0056b3; /* Couleur plus sombre au survol */
     }
 </style>
 @endsection

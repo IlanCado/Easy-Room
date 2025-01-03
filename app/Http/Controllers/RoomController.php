@@ -105,4 +105,10 @@ class RoomController extends Controller
 
         return redirect()->route('rooms.index')->with('success', 'Salle supprimée avec succès.');
     }
+    public function adminIndex()
+{
+    $rooms = Room::with('equipments')->get();
+    return view('admin.rooms', compact('rooms')); 
+}
+
 }
