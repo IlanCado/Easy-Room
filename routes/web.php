@@ -26,11 +26,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-reservations', [ReservationController::class, 'userReservations'])->name('my-reservations');
 });
 
-// Routes pour les salles
-Route::resource('rooms', RoomController::class);
+// Routes protégées par middleware pour les administrateurs uniquement
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Gestion des salles
+    Route::resource('rooms', RoomController::class);
 
-// Routes pour les équipements
-Route::resource('equipments', EquipmentController::class);
+    // Gestion des équipements
+    Route::resource('equipments', EquipmentController::class);
+
+    // Gestion des utilisateurs
+    Route::get('/users', [UserController::class, 'index'])->name('users.index'); // Afficher tous les utilisateurs
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy'); // Supprimer un utilisateur
+    Route::get('/users/{id}/reservations', [UserController::class, 'showReservations'])->name('users.reservations'); // Voir les réservations d'un utilisateur
+});
 
 // Routes pour les réservations
 Route::prefix('reservations')->group(function () {
@@ -46,13 +54,6 @@ Route::prefix('reservations')->group(function () {
             'roomId' => request()->query('roomId'),
         ]);
     })->name('reservations.confirmation');
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/users', [UserController::class, 'index'])->name('users.index'); // Afficher tous les utilisateurs
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy'); // Supprimer un utilisateur
-    Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
-    Route::get('/users/{id}/reservations', [UserController::class, 'showReservations'])->name('users.reservations');
 });
 
 // Authentification

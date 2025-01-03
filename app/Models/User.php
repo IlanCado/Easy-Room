@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
      // Relation : Un utilisateur peut avoir plusieurs réservations
