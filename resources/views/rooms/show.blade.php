@@ -2,78 +2,69 @@
 
 @section('content')
 <div class="container mt-4">
-    <h1 class="mb-4">{{ $room->name }}</h1>
-
-    <!-- Messages de succès ou d'erreur -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <!-- Layout principal avec deux colonnes -->
     <div class="row">
-        <!-- Colonne de gauche : Informations et formulaire -->
+        <!-- Colonne de gauche : Image, Titre, Informations et Réservation -->
         <div class="col-md-4">
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold text-primary">{{ $room->name }}</h1> <br>
+                @if ($room->image)
+                    <img src="{{ asset($room->image) }}" 
+                         alt="Image de la salle {{ $room->name }}" 
+                         class="img-fluid rounded shadow mb-3" 
+                         style="width: 100%; height: 300px; object-fit: cover;">
+                @else
+                    <img src="{{ asset('images/default-room.png') }}" 
+                         alt="Image par défaut" 
+                         class="img-fluid rounded shadow mb-3" 
+                         style="width: 100%; height: 300px; object-fit: cover;">
+                @endif
+            </div>
+
             <!-- Informations sur la salle -->
-            <div class="card mb-4">
+            <div class="card mb-4 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Informations</h5>
-                    <p><strong>Description:</strong> {{ $room->description }}</p>
-                    <p><strong>Capacité:</strong> {{ $room->capacity }} personnes</p>
+                    <h5 class="card-title">Informations sur la salle</h5>
+                    <p><strong>Description :</strong> {{ $room->description }}</p>
+                    <p><strong>Capacité :</strong> {{ $room->capacity }} personnes</p>
                     @if ($room->equipments->isNotEmpty())
-                        <p><strong>Équipements:</strong></p>
-                        <ul>
+                        <p><strong>Équipements :</strong></p>
+                        <ul class="list-unstyled">
                             @foreach ($room->equipments as $equipment)
-                                <li>{{ $equipment->name }}</li>
+                                <li>- {{ $equipment->name }}</li>
                             @endforeach
                         </ul>
                     @else
-                        <p><strong>Équipements:</strong> Aucun</p>
+                        <p><strong>Équipements :</strong> Aucun</p>
                     @endif
                 </div>
             </div>
 
             <!-- Formulaire de réservation -->
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Poser une réservation</h5>
                     <form action="{{ route('reservations.store') }}" method="POST" id="reservation-form">
                         @csrf
                         <input type="hidden" name="room_id" value="{{ $room->id }}">
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="start_time" class="form-label">Heure de début</label>
                             <input 
                                 type="datetime-local" 
-                                class="form-control" 
+                                class="form-control form-control-lg" 
                                 id="start_time" 
                                 name="start_time" 
-                                required 
-                                pattern="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}"
-                                placeholder="YYYY-MM-DDTHH:MM"
-                            >
+                                required>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="end_time" class="form-label">Heure de fin</label>
                             <input 
                                 type="datetime-local" 
-                                class="form-control" 
+                                class="form-control form-control-lg" 
                                 id="end_time" 
                                 name="end_time" 
-                                required 
-                                pattern="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}"
-                                placeholder="YYYY-MM-DDTHH:MM"
-                            >
+                                required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Réserver</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Réserver</button>
                     </form>
                 </div>
             </div>
@@ -81,10 +72,10 @@
 
         <!-- Colonne de droite : Calendrier -->
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Calendrier des réservations</h5>
-                    <div id="calendar" data-room-id="{{ $room->id }}" style="min-height: 600px;"></div>
+                    <h5 class="card-title text-center">Calendrier des réservations</h5>
+                    <div id="calendar" data-room-id="{{ $room->id }}" style="min-height: 800px;"></div>
                 </div>
             </div>
         </div>
@@ -120,7 +111,8 @@ document.addEventListener('DOMContentLoaded', function () {
         slotMinTime: '07:00:00',
         slotMaxTime: '20:00:00',
         allDaySlot: false,
-        height: 'auto',
+        height: 900, // Hauteur du calendrier augmentée
+        aspectRatio: 1.5, // Rapport largeur/hauteur pour plus de largeur
         selectable: true,
         select: function (info) {
             const start = info.startStr;
