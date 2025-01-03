@@ -5,6 +5,39 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Nos Salles</h1>
     </div>
+
+    <!-- Filtres -->
+    <form method="GET" action="{{ route('home') }}" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="capacity" class="form-label">Capacité minimale</label>
+                <input type="number" name="capacity" id="capacity" class="form-control" placeholder="Ex : 10" value="{{ request('capacity') }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Équipements</label>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach ($equipments as $equipment)
+                        <div class="form-check">
+                            <input 
+                                type="checkbox" 
+                                name="equipments[]" 
+                                value="{{ $equipment->id }}" 
+                                class="form-check-input" 
+                                id="equipment-{{ $equipment->id }}"
+                                {{ is_array(request('equipments')) && in_array($equipment->id, request('equipments')) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="equipment-{{ $equipment->id }}">{{ $equipment->name }}</label>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            <div class="col-md-3 align-self-end d-flex">
+                <button type="submit" class="btn btn-primary w-100 me-2">Appliquer les filtres</button>
+                <a href="{{ route('home') }}" class="btn btn-secondary w-100">Supprimer les filtres</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Liste des salles -->
     <div class="row gy-4">
         @forelse ($rooms as $room)
             <div class="col-md-4">

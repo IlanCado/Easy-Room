@@ -17,7 +17,7 @@
 
         <form action="{{ route('rooms.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <!-- Nom de la salle -->
+            <!-- Nom -->
             <div class="mb-3">
                 <label for="name" class="form-label">Nom</label>
                 <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>
@@ -37,17 +37,20 @@
 
             <!-- Équipements -->
             <div class="mb-3">
-                <label for="equipments" class="form-label">Équipements</label>
-                <select name="equipments[]" id="equipments" class="form-control" multiple>
-                    @forelse (\App\Models\Equipment::all() as $equipment)
-                        <option value="{{ $equipment->id }}" 
-                            @if(isset($room) && $room->equipments->contains($equipment->id)) selected @endif>
-                            {{ $equipment->name }}
-                        </option>
-                    @empty
-                        <option disabled>Aucun équipement disponible</option>
-                    @endforelse
-                </select>
+                <label class="form-label">Équipements</label>
+                <div class="form-check">
+                    @foreach (\App\Models\Equipment::all() as $equipment)
+                        <div class="mb-2">
+                            <input type="checkbox" 
+                                   name="equipments[]" 
+                                   value="{{ $equipment->id }}" 
+                                   id="equipment-{{ $equipment->id }}" 
+                                   class="form-check-input"
+                                   @if(is_array(old('equipments')) && in_array($equipment->id, old('equipments'))) checked @endif>
+                            <label for="equipment-{{ $equipment->id }}" class="form-check-label">{{ $equipment->name }}</label>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
             <!-- Image -->
@@ -56,7 +59,7 @@
                 <input type="file" name="image" id="image" class="form-control" accept="image/*">
             </div>
 
-            <!-- Bouton de soumission -->
+            <!-- Bouton -->
             <button type="submit" class="btn btn-primary">Enregistrer</button>
         </form>
     </div>
