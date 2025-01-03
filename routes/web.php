@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 // Routes protégées par middleware pour les administrateurs uniquement
 Route::middleware(['auth', 'admin'])->group(function () {
     // Gestion des salles
-    Route::resource('rooms', RoomController::class);
+    Route::resource('rooms', RoomController::class)->except(['show']); // L'action "show" doit rester publique
 
     // Gestion des équipements
     Route::resource('equipments', EquipmentController::class);
@@ -55,6 +55,9 @@ Route::prefix('reservations')->group(function () {
         ]);
     })->name('reservations.confirmation');
 });
+
+// Route publique pour afficher une salle spécifique (accessible par tout le monde)
+Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
 
 // Authentification
 require __DIR__ . '/auth.php';

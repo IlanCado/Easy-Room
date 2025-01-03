@@ -18,42 +18,85 @@
         </div>
     @endif
 
-    <!-- Affichage des réservations -->
+    <!-- Affichage des réservations sous forme de cartes -->
     @if ($reservations->isEmpty())
-        <p>Aucune réservation trouvée.</p>
+        <div class="alert alert-warning" role="alert">
+            Vous n'avez aucune réservation pour le moment. Explorez les <a href="{{ route('rooms.index') }}" class="alert-link">salles disponibles</a> pour en réserver une !
+        </div>
     @else
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Salle</th>
-                    <th>Début</th>
-                    <th>Fin</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($reservations as $reservation)
-                    <tr>
-                        <td>{{ $reservation->id }}</td>
-                        <td>{{ $reservation->room->name }}</td>
-                        <td>{{ \Carbon\Carbon::parse($reservation->start_time)->format('d/m/Y H:i') }}</td>
-                        <td>{{ \Carbon\Carbon::parse($reservation->end_time)->format('d/m/Y H:i') }}</td>
-                        <td>
-                            <!-- Lien vers le détail de la réservation -->
-                            <a href="{{ route('reservations.calendar', $reservation->room->id) }}" class="btn btn-info btn-sm">Voir le calendrier</a>
+        <div class="row">
+            @foreach ($reservations as $reservation)
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <!-- Affichage de l'image de la salle -->
+                        @if ($reservation->room->image)
+                            <img src="{{ asset('storage/' . $reservation->room->image) }}" class="card-img-top" alt="Image de la salle {{ $reservation->room->name }}">
+                        @else
+                            <img src="https://via.placeholder.com/500x300?text=Aucune+Image" class="card-img-top" alt="Image par défaut">
+                        @endif
 
-                            <!-- Formulaire pour supprimer une réservation -->
-                            <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST" style="display:inline-block;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Voulez-vous vraiment supprimer cette réservation ?');">Supprimer</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        <div class="card-body">
+                            <!-- Nom de la salle -->
+                            <h5 class="card-title">{{ $reservation->room->name }}</h5>
+                            
+                            <!-- Informations de la réservation -->
+                            <p class="card-text">
+                                <strong>Début :</strong> {{ \Carbon\Carbon::parse($reservation->start_time)->format('d/m/Y H:i') }}<br>
+                                <strong>Fin :</strong> {{ \Carbon\Carbon::parse($reservation->end_time)->format('d/m/Y H:i') }}
+                            </p>
+                            
+                            <!-- Actions -->
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ route('reservations.calendar', $reservation->room->id) }}" class="btn btn-info btn-sm">
+                                    Voir le calendrier
+                                </a>
+                                <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST" style="display:inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Voulez-vous vraiment supprimer cette réservation ?');">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     @endif
 </div>
+
+<style>
+    h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-img-top {
+        max-height: 200px;
+        object-fit: cover;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .btn-sm {
+        font-size: 0.85rem;
+    }
+</style>
 @endsection

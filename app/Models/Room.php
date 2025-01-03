@@ -13,6 +13,7 @@ class Room extends Model
         'name',
         'description',
         'capacity',
+        'image',
     ];
 
     // Relation : Une salle peut avoir plusieurs équipements

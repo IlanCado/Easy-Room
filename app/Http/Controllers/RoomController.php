@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\Equipment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RoomController extends Controller
 {
@@ -26,9 +27,17 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096', 
             'equipments' => 'nullable|array',
             'equipments.*' => 'exists:equipments,id',
         ]);
+
+        // Gestion de l'upload d'image
+        if ($request->hasFile('image')) {
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $filePath = $request->file('image')->storeAs('rooms', $fileName, 'public');
+            $validated['image'] = '/storage/' . $filePath;
+        }
 
         $room = Room::create($validated);
 
@@ -58,9 +67,22 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validation pour l'image
             'equipments' => 'nullable|array',
             'equipments.*' => 'exists:equipments,id',
         ]);
+
+        // Gestion de l'upload d'une nouvelle image
+        if ($request->hasFile('image')) {
+            // Supprime l'ancienne image si elle existe
+            if ($room->image && Storage::exists('public/' . $room->image)) {
+                Storage::delete('public/' . $room->image);
+            }
+
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $filePath = $request->file('image')->storeAs('rooms', $fileName, 'public');
+            $validated['image'] = '/storage/' . $filePath;
+        }
 
         $room->update($validated);
 
@@ -73,6 +95,11 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
+        // Supprime l'image associée si elle existe
+        if ($room->image && Storage::exists('public/' . $room->image)) {
+            Storage::delete('public/' . $room->image);
+        }
+
         $room->equipments()->detach();
         $room->delete();
 
