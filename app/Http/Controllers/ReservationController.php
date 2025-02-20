@@ -21,7 +21,7 @@ class ReservationController extends Controller
 
         return $reservations->map(function ($reservation) {
             return [
-                'title' => 'Réservé par ' . ($reservation->user->name ?? 'Utilisateur'),
+                'title' => 'Réservé',
                 'start' => $reservation->start_time,
                 'end' => $reservation->end_time,
             ];

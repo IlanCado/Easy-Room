@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const calendar = new Calendar(calendarEl, {
         plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-        initialView: 'timeGridWeek', 
+        initialView: 'timeGridWeek',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
@@ -34,11 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
             week: 'Semaine',
             day: 'Jour',
         },
-        events: `/reservations/${roomId}`, 
-        slotMinTime: '07:00:00', 
-        slotMaxTime: '20:00:00', 
-        scrollTime: '07:00:00', 
-        allDaySlot: false, 
+        events: `/reservations/${roomId}`,
+        slotMinTime: '07:00:00',
+        slotMaxTime: '20:00:00',
+        scrollTime: '07:00:00',
+        allDaySlot: false,
         selectable: true,
         select: function (info) {
             const start = new Date(info.startStr);
@@ -46,12 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = new Date();
 
             if (start < now) {
-                alert('Erreur : Vous ne pouvez pas réserver un créneau qui commence dans le passé.');
                 return;
             }
 
             if (end <= start) {
-                alert('Erreur : L\'heure de fin doit être après l\'heure de début.');
                 return;
             }
 
@@ -77,19 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .then(data => {
                     console.log('✅ Réservation confirmée:', data);
-                    alert(data.success || 'Réservation créée avec succès.');
-                    calendar.refetchEvents(); 
+                    calendar.refetchEvents();
                 })
                 .catch(error => {
                     console.error('❌ Erreur lors de la réservation:', error);
-                    alert(`Erreur : ${error.error || 'Une erreur inconnue est survenue.'}`);
                 });
         },
         eventContent: function (eventInfo) {
             return {
                 html: `
                     <span style="font-size: 0.85em; font-weight: bold;">${eventInfo.timeText}</span>
-                    <br>
                     <span style="font-size: 0.75em;">${eventInfo.event.title}</span>
                 `,
             };
