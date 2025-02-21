@@ -9,10 +9,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+/**
+ * Class ProfileController
+ * Gère la gestion du profil utilisateur : affichage, mise à jour et suppression.
+ *
+ * @package App\Http\Controllers
+ */
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Affiche le formulaire de modification du profil utilisateur.
+     *
+     * @param \Illuminate\Http\Request $request Requête contenant l'utilisateur authentifié
+     * @return \Illuminate\View\View Vue du formulaire de modification du profil
      */
     public function edit(Request $request): View
     {
@@ -22,12 +31,16 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Met à jour les informations du profil utilisateur.
+     *
+     * @param \App\Http\Requests\ProfileUpdateRequest $request Requête validée contenant les nouvelles informations du profil
+     * @return \Illuminate\Http\RedirectResponse Redirection vers le formulaire de modification avec un message de confirmation
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
 
+        // Si l'email est modifié, annuler la vérification précédente
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
@@ -38,7 +51,10 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Supprime le compte utilisateur.
+     *
+     * @param \Illuminate\Http\Request $request Requête contenant le mot de passe de confirmation
+     * @return \Illuminate\Http\RedirectResponse Redirection vers la page d'accueil après suppression du compte
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -52,6 +68,7 @@ class ProfileController extends Controller
 
         $user->delete();
 
+        // Invalider la session et régénérer le token de sécurité
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

@@ -6,12 +6,18 @@ use App\Models\User;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 
+/**
+ * Class UserController
+ * Gère la gestion des utilisateurs : affichage, suppression et visualisation des réservations.
+ *
+ * @package App\Http\Controllers
+ */
 class UserController extends Controller
 {
     /**
-     * Afficher la liste des utilisateurs.
+     * Affiche la liste des utilisateurs.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View Vue affichant la liste des utilisateurs
      */
     public function index()
     {
@@ -20,10 +26,10 @@ class UserController extends Controller
     }
 
     /**
-     * Afficher les réservations d'un utilisateur spécifique.
+     * Affiche les réservations d'un utilisateur spécifique.
      *
-     * @param int $id
-     * @return \Illuminate\View\View
+     * @param int $id Identifiant de l'utilisateur
+     * @return \Illuminate\View\View Vue affichant les réservations de l'utilisateur
      */
     public function showReservations($id)
     {
@@ -33,10 +39,10 @@ class UserController extends Controller
     }
 
     /**
-     * Supprimer un utilisateur spécifique.
+     * Supprime un utilisateur ainsi que ses réservations associées.
      *
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @param int $id Identifiant de l'utilisateur à supprimer
+     * @return \Illuminate\Http\RedirectResponse Redirection avec un message de confirmation
      */
     public function destroy($id)
     {

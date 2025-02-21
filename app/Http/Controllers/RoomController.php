@@ -7,8 +7,20 @@ use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Class RoomController
+ * Gère la gestion des salles : affichage, création, modification et suppression.
+ *
+ * @package App\Http\Controllers
+ */
 class RoomController extends Controller
 {
+    /**
+     * Affiche la liste des salles avec filtres par capacité et équipements.
+     *
+     * @param \Illuminate\Http\Request $request Requête contenant les paramètres de filtrage
+     * @return \Illuminate\View\View Vue affichant la liste des salles
+     */
     public function index(Request $request)
     {
         $capacity = $request->query('capacity');
@@ -23,7 +35,7 @@ class RoomController extends Controller
 
         if (!empty($equipmentIds)) {
             $query->whereHas('equipments', function ($q) use ($equipmentIds) {
-                $q->whereIn('equipments.id', $equipmentIds); // Utilisation de `equipments.id` pour éviter l'ambiguïté
+                $q->whereIn('equipments.id', $equipmentIds);
             });
         }
 
@@ -33,12 +45,23 @@ class RoomController extends Controller
         return view('rooms.index', compact('rooms', 'equipments', 'capacity', 'equipmentIds'));
     }
 
+    /**
+     * Affiche le formulaire de création d'une salle.
+     *
+     * @return \Illuminate\View\View Vue du formulaire de création
+     */
     public function create()
     {
         $equipments = Equipment::all();
         return view('rooms.create', compact('equipments'));
     }
 
+    /**
+     * Enregistre une nouvelle salle avec ses équipements associés.
+     *
+     * @param \Illuminate\Http\Request $request Requête contenant les données de la salle
+     * @return \Illuminate\Http\RedirectResponse Redirection avec un message de succès ou d'erreur
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -66,12 +89,24 @@ class RoomController extends Controller
         return redirect()->route('home')->with('success', 'Salle créée avec succès.');
     }
 
+    /**
+     * Affiche les détails d'une salle.
+     *
+     * @param \App\Models\Room $room La salle à afficher
+     * @return \Illuminate\View\View Vue affichant les détails de la salle
+     */
     public function show(Room $room)
     {
         $room->load('equipments');
         return view('rooms.show', compact('room'));
     }
 
+    /**
+     * Affiche le formulaire d'édition d'une salle.
+     *
+     * @param \App\Models\Room $room La salle à modifier
+     * @return \Illuminate\View\View Vue affichant le formulaire de modification
+     */
     public function edit(Room $room)
     {
         $equipments = Equipment::all();
@@ -79,6 +114,13 @@ class RoomController extends Controller
         return view('rooms.edit', compact('room', 'equipments'));
     }
 
+    /**
+     * Met à jour une salle et ses équipements.
+     *
+     * @param \Illuminate\Http\Request $request Requête contenant les nouvelles informations de la salle
+     * @param \App\Models\Room $room La salle à mettre à jour
+     * @return \Illuminate\Http\RedirectResponse Redirection avec un message de succès
+     */
     public function update(Request $request, Room $room)
     {
         $validated = $request->validate([
@@ -110,6 +152,12 @@ class RoomController extends Controller
         return redirect()->route('home')->with('success', 'Salle mise à jour avec succès.');
     }
 
+    /**
+     * Supprime une salle ainsi que son image et ses relations avec les équipements.
+     *
+     * @param \App\Models\Room $room La salle à supprimer
+     * @return \Illuminate\Http\RedirectResponse Redirection avec un message de confirmation
+     */
     public function destroy(Room $room)
     {
         if ($room->image && Storage::exists('public/' . $room->image)) {
@@ -122,6 +170,11 @@ class RoomController extends Controller
         return redirect()->route('home')->with('success', 'Salle supprimée avec succès.');
     }
 
+    /**
+     * Affiche la liste des salles pour l'administration.
+     *
+     * @return \Illuminate\View\View Vue affichant les salles avec leurs équipements
+     */
     public function adminIndex()
     {
         $rooms = Room::with('equipments')->get();

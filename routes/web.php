@@ -7,48 +7,109 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Page d'accueil avec la liste des salles
+/**
+ * Page d'accueil affichant la liste des salles disponibles.
+ */
 Route::get('/', [RoomController::class, 'index'])->name('home');
 
-// Tableau de bord protégé par middleware
+/**
+ * Tableau de bord (non utilisé actuellement).
+ * Protéger par le middleware d'authentification.
+ */
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Routes protégées par middleware pour les utilisateurs authentifiés
+/**
+ * Routes accessibles uniquement aux utilisateurs authentifiés.
+ */
 Route::middleware('auth.check')->group(function () {
-    // Gestion du profil utilisateur
+    /**
+     * Gestion du profil utilisateur (édition, mise à jour, suppression).
+     */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
-    // Mes réservations
+
+    /**
+     * Affichage des réservations personnelles de l'utilisateur connecté.
+     */
     Route::get('/my-reservations', [ReservationController::class, 'userReservations'])
         ->name('my-reservations');
 });
 
-// Routes protégées par middleware pour les administrateurs uniquement
+/**
+ * Routes accessibles uniquement aux administrateurs.
+ */
 Route::middleware(['auth.check', 'admin'])->group(function () {
-    // Gestion des salles
-    Route::get('/admin/rooms', [RoomController::class, 'adminIndex'])->name('admin.rooms.index'); // Page d'administration des salles
-    Route::resource('rooms', RoomController::class)->except(['show']); // L'action "show" reste publique
+    /**
+     * Gestion des salles d'administration.
+     */
+    Route::get('/admin/rooms', [RoomController::class, 'adminIndex'])->name('admin.rooms.index');
+    
+    /**
+     * Routes CRUD pour les salles (sauf l'affichage public).
+     */
+    Route::resource('rooms', RoomController::class)->except(['show']);
 
-    // Gestion des équipements
+    /**
+     * Routes CRUD pour les équipements.
+     */
     Route::resource('equipments', EquipmentController::class);
 
-    // Gestion des utilisateurs
-    Route::get('/users', [UserController::class, 'index'])->name('users.index'); // Afficher tous les utilisateurs
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy'); // Supprimer un utilisateur
-    Route::get('/users/{id}/reservations', [UserController::class, 'showReservations'])->name('users.reservations'); // Voir les réservations d'un utilisateur
+    /**
+     * Gestion des utilisateurs (affichage, suppression et réservations).
+     */
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/users/{id}/reservations', [UserController::class, 'showReservations'])->name('users.reservations');
 });
 
-// Routes pour les réservations
+/**
+ * Routes de gestion des réservations (authentification requise).
+ */
 Route::prefix('reservations')->middleware('auth.check')->group(function () {
-    Route::get('/calendar/{roomId}', [ReservationController::class, 'calendar'])->name('reservations.calendar'); // Afficher le calendrier d'une salle
-    Route::get('/{roomId}', [ReservationController::class, 'getReservationsByRoom']); // Récupérer les réservations pour une salle
-    Route::post('/', [ReservationController::class, 'store'])->name('reservations.store'); // Créer une nouvelle réservation
-    Route::delete('/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy'); // Supprimer une réservation
-    Route::get('/details/{id}', [ReservationController::class, 'show'])->name('reservations.details'); // Voir les détails d'une réservation
+    /**
+     * Affichage du calendrier des réservations d'une salle.
+     *
+     * @param int $roomId ID de la salle
+     */
+    Route::get('/calendar/{roomId}', [ReservationController::class, 'calendar'])->name('reservations.calendar');
+
+    /**
+     * Récupération des réservations d'une salle.
+     *
+     * @param int $roomId ID de la salle
+     * @return \Illuminate\Support\Collection Liste des réservations au format JSON
+     */
+    Route::get('/{roomId}', [ReservationController::class, 'getReservationsByRoom']);
+
+    /**
+     * Création d'une nouvelle réservation.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirection avec un message de confirmation
+     */
+    Route::post('/', [ReservationController::class, 'store'])->name('reservations.store');
+
+    /**
+     * Suppression d'une réservation.
+     *
+     * @param int $id ID de la réservation
+     * @return \Illuminate\Http\RedirectResponse Redirection avec un message de confirmation
+     */
+    Route::delete('/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+
+    /**
+     * Affichage des détails d'une réservation spécifique.
+     *
+     * @param int $id ID de la réservation
+     * @return \Illuminate\View\View Vue affichant les détails de la réservation
+     */
+    Route::get('/details/{id}', [ReservationController::class, 'show'])->name('reservations.details');
+
+    /**
+     * Page de confirmation d'une réservation.
+     */
     Route::get('/confirmation', function () {
         return view('reservations.confirmation', [
             'status' => request()->query('status'),
@@ -58,10 +119,17 @@ Route::prefix('reservations')->middleware('auth.check')->group(function () {
     })->name('reservations.confirmation');
 });
 
-// Route publique pour afficher une salle spécifique
+/**
+ * Affichage public d'une salle spécifique.
+ *
+ * @param int $room ID de la salle
+ * @return \Illuminate\View\View Vue affichant les détails de la salle
+ */
 Route::get('/rooms/{room}', [RoomController::class, 'show'])
     ->name('rooms.show')
-    ->middleware('auth.check'); // Afficher une alerte pour les non-authentifiés
+    ->middleware('auth.check'); // Affichage avec alerte pour les non-authentifiés
 
-// Authentification
+/**
+ * Inclusion des routes d'authentification générées par Laravel.
+ */
 require __DIR__ . '/auth.php';
