@@ -67,7 +67,11 @@ Copiez le fichier .env.example en .env et configurez la base de données :
 cp .env.example .env
 php artisan key:generate
 
-Modifiez .env avec les informations de votre base de données 
+Modifiez .env avec les informations de votre base de données
+
+Injectez des données dans la base avec les seeders
+
+php artisan migrate:refresh --seed 
 
 6. Lancer le serveur
 
