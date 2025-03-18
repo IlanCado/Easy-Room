@@ -153,22 +153,32 @@ class RoomController extends Controller
     }
 
     /**
-     * Supprime une salle ainsi que son image et ses relations avec les équipements.
-     *
-     * @param \App\Models\Room $room La salle à supprimer
-     * @return \Illuminate\Http\RedirectResponse Redirection avec un message de confirmation
-     */
-    public function destroy(Room $room)
-    {
-        if ($room->image && Storage::exists('public/' . $room->image)) {
-            Storage::delete('public/' . $room->image);
-        }
-
-        $room->equipments()->detach();
-        $room->delete();
-
-        return redirect()->route('home')->with('success', 'Salle supprimée avec succès.');
+ * Supprime une salle uniquement si elle n'a pas de réservations actives.
+ *
+ * @param \App\Models\Room $room La salle à supprimer
+ * @return \Illuminate\Http\RedirectResponse Redirection avec un message de confirmation ou d'erreur
+ */
+public function destroy(Room $room)
+{
+    // Vérifie si la salle a encore des réservations
+    if ($room->reservations()->exists()) {
+        return redirect()->route('home')->with('error', 'Impossible de supprimer une salle ayant des réservations actives.');
     }
+
+    // Suppression de l'image associée
+    if ($room->image && Storage::exists('public/' . $room->image)) {
+        Storage::delete('public/' . $room->image);
+    }
+
+    // Détache les équipements associés
+    $room->equipments()->detach();
+
+    // Suppression de la salle
+    $room->delete();
+
+    return redirect()->route('home')->with('success', 'Salle supprimée avec succès.');
+}
+
 
     /**
      * Affiche la liste des salles pour l'administration.
