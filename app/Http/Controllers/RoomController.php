@@ -34,9 +34,11 @@ class RoomController extends Controller
         }
 
         if (!empty($equipmentIds)) {
-            $query->whereHas('equipments', function ($q) use ($equipmentIds) {
-                $q->whereIn('equipments.id', $equipmentIds);
-            });
+            foreach ($equipmentIds as $equipmentId) {
+                $query->whereHas('equipments', function ($q) use ($equipmentId) {
+                    $q->where('equipments.id', $equipmentId);
+                });
+            }
         }
 
         $rooms = $query->with('equipments')->get();
@@ -45,7 +47,7 @@ class RoomController extends Controller
         return view('rooms.index', compact('rooms', 'equipments', 'capacity', 'equipmentIds'));
     }
 
-    /**
+ /**
      * Affiche le formulaire de création d'une salle.
      *
      * @return \Illuminate\View\View Vue du formulaire de création
@@ -56,7 +58,7 @@ class RoomController extends Controller
         return view('rooms.create', compact('equipments'));
     }
 
-    /**
+     /**
      * Enregistre une nouvelle salle avec ses équipements associés.
      *
      * @param \Illuminate\Http\Request $request Requête contenant les données de la salle
@@ -73,7 +75,7 @@ class RoomController extends Controller
             'equipments.*' => 'exists:equipments,id',
         ]);
 
-        // Gestion de l'upload d'image
+            // Gestion de l'upload d'image
         if ($request->hasFile('image')) {
             $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
             $filePath = $request->file('image')->storeAs('rooms', $fileName, 'public');
@@ -169,8 +171,8 @@ class RoomController extends Controller
 
         return redirect()->route('home')->with('success', 'Salle supprimée avec succès.');
     }
-
-    /**
+    
+  /**
      * Affiche la liste des salles pour l'administration.
      *
      * @return \Illuminate\View\View Vue affichant les salles avec leurs équipements
