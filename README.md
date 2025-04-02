@@ -69,15 +69,29 @@ php artisan key:generate
 
 Modifiez .env avec les informations de votre base de données
 
-Injectez des données dans la base avec les seeders
+5. Injectez des données dans la base avec les seeders
 
 php artisan migrate:refresh --seed 
 
-6. Lancer le serveur
+6. Lancer le serveur et compiler les assets
 
 php artisan serve
 
+npm run dev 
+
 L'application est maintenant accessible sur http://127.0.0.1:8000 🎉
+
+### 👤 Accès administrateur
+Un compte administrateur est automatiquement créé lors du `php artisan migrate:fresh --seed` :
+
+Email : admin@admin.com  
+Mot de passe : adminadmin
+
+### 👤 Accès utilisateur
+Un compte utilisateur est automatiquement créé lors du `php artisan migrate:fresh --seed` :
+
+Email : utili@utili.com  
+Mot de passe : utiliutili
 
 🛠️ Fonctionnalités
 
