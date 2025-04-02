@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('my-reservations')" :active="request()->routeIs('my-reservations')">
                         {{ __('Mes Réservations') }}
                     </x-nav-link>
+                    <x-nav-link href="https://support.easyroom.cloud:50273" target="_blank">
+                        {{ __('Support') }}
+                    </x-nav-link>
 
                     @if(auth()->check() && auth()->user()->role === 'admin') <!-- Vérification du rôle admin -->
                         <x-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.index')">
